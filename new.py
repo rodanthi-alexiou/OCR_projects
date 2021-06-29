@@ -24,17 +24,31 @@ def getTrackID(name):
         return track['uri']
 
 
+def getArtist(name):
+    results = sp.search(q='artist:' + name, type='artist')
+    items = results['artists']['items']
+    if len(items) > 0:
+        artist = items[0]
+        return artist['uri']
 
 
-def add_song_to_playlist():
+def most_played_songs(artist):
+    songs = []
+    artist_id=getArtist(artist)
+    tracks=[]
+    tracks = sp.artist_top_tracks(artist_id,'US')
+    for i in range(0,len(tracks['tracks'])):
+        songs.append(tracks['tracks'][i]['uri'])
+
+    return songs
 
 
-    song_id=getTrackID("Call Me")
-    # create a new playlist
+def add_song_to_playlist(songs):
+
+
     playlist_id = "0QenuUPQl69LxnVDSOkE6f"
-    songs=[]
-    songs.append(song_id)
-        # add all songs into new playlist
+
+    
     request_data = json.dumps(songs)
 
     query = "https://api.spotify.com/v1/playlists/{}/tracks".format(
@@ -48,7 +62,6 @@ def add_song_to_playlist():
             "Authorization": "Bearer {}".format(spotify_token)
         }
         )
-
 
     response_json = response.json()
     return response_json
